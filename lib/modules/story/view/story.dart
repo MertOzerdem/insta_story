@@ -16,14 +16,15 @@ class Story extends StatelessWidget {
           color: Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
               .withOpacity(1.0)),
       child: GestureDetector(
-          onTapUp: (details) => _onTapUp(details, context),
-          child: BlocBuilder<StoryBloc, StoryState>(
-            builder: (context, state) {
-              return state.mediaUrl.contains(".mp4")
-                  ? const VideoStory()
-                  : const StaticStory();
-            },
-          )),
+        onTapUp: (details) => _onTapUp(details, context),
+        child: BlocBuilder<StoryBloc, StoryState>(
+          builder: (context, state) {
+            return state.mediaUrl.contains(".mp4")
+                ? const VideoStory()
+                : StaticStory();
+          },
+        ),
+      ),
     );
   }
 

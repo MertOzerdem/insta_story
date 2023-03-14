@@ -13,7 +13,6 @@ class VideoStory extends StatefulWidget {
 
 class _VideoStoryState extends State<VideoStory> {
   late VideoPlayerController _controller;
-  late Future<void> _initializeVideoPlayerFuture;
   late StoryBloc _storyBloc;
 
   @override
@@ -23,7 +22,9 @@ class _VideoStoryState extends State<VideoStory> {
 
     _controller = VideoPlayerController.network(_storyBloc.state.mediaUrl);
 
-    // _initializeVideoPlayerFuture = _controller.initialize();
+    _controller.initialize().then((value) {
+      _storyBloc.add(StoryFetched(_controller.value.duration));
+    });
   }
 
   @override
@@ -34,31 +35,28 @@ class _VideoStoryState extends State<VideoStory> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initializeController(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          _storyBloc.add(StoryFetched());
-          return FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: _controller.value.size.width,
-              height: _controller.value.size.height,
-              child: VideoPlayer(_controller),
-            ),
-          );
-        } else {
+    return BlocBuilder<StoryBloc, StoryState>(
+      builder: (context, state) {
+        if (state.storyStatus == StoryStatus.initial) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
+
+        if (state.storyStatus == StoryStatus.initialized) {
+          _controller.play();
+          _storyBloc.add(StoryPlayed());
+        } else if (state.storyStatus == StoryStatus.playing) {}
+
+        return FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller.value.size.width,
+            height: _controller.value.size.height,
+            child: VideoPlayer(_controller),
+          ),
+        );
       },
     );
-  }
-
-  Future<void> _initializeController() async {
-    await _controller.initialize();
-
-    _controller.play();
   }
 }
