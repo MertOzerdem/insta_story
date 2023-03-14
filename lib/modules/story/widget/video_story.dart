@@ -14,15 +14,16 @@ class VideoStory extends StatefulWidget {
 class _VideoStoryState extends State<VideoStory> {
   late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
+  late StoryBloc _storyBloc;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-      context.read<StoryBloc>().state.mediaUrl,
-    );
+    _storyBloc = context.read<StoryBloc>();
 
-    _initializeVideoPlayerFuture = _controller.initialize();
+    _controller = VideoPlayerController.network(_storyBloc.state.mediaUrl);
+
+    // _initializeVideoPlayerFuture = _controller.initialize();
   }
 
   @override
@@ -34,12 +35,17 @@ class _VideoStoryState extends State<VideoStory> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _initializeVideoPlayerFuture,
+      future: _initializeController(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
+          _storyBloc.add(StoryFetched());
+          return FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: _controller.value.size.width,
+              height: _controller.value.size.height,
+              child: VideoPlayer(_controller),
+            ),
           );
         } else {
           return const Center(
@@ -48,5 +54,11 @@ class _VideoStoryState extends State<VideoStory> {
         }
       },
     );
+  }
+
+  Future<void> _initializeController() async {
+    await _controller.initialize();
+
+    _controller.play();
   }
 }

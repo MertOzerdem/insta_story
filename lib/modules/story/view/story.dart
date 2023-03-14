@@ -29,6 +29,5 @@ class Story extends StatelessWidget {
 
   void _onTapUp(TapUpDetails details, BuildContext context) {
     context.read<StoryBloc>().add(StoryTappedUp());
-    print(details);
   }
 }
