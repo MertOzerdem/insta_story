@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:insta_story/modules/story/view/story_page.dart';
 import '../../models/story.dart';
 import 'cubit/story_viewer_cubit.dart';
 
@@ -39,11 +40,12 @@ class _StoryViewerState extends State<StoryViewer>
           itemCount: widget.stories.length,
           itemBuilder: (context, i) {
             final Story story = widget.stories[i];
-            return Container(
-              decoration: BoxDecoration(
-                  color: Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-                      .withOpacity(1.0)),
-            );
+            // return Container(
+            //   decoration: BoxDecoration(
+            //       color: Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
+            //           .withOpacity(1.0)),
+            // );
+            return StoryPage(mediaUrl: story.url);
           },
         ),
       ]),
@@ -68,7 +70,6 @@ class _StoryViewerState extends State<StoryViewer>
       }
     }
 
-    print(_storyViewerCubit.state);
     _pageController.animateToPage(
       _storyViewerCubit.state,
       duration: const Duration(milliseconds: 1),
