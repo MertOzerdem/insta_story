@@ -11,6 +11,7 @@ class StaticStory extends StatelessWidget {
   Widget build(BuildContext context) {
     return CachedNetworkImage(
       imageUrl: context.read<StoryBloc>().state.mediaUrl,
+      placeholder: (context, url) => const CircularProgressIndicator(),
       fit: BoxFit.cover,
     );
   }

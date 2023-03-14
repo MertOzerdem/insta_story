@@ -20,8 +20,8 @@ class Story extends StatelessWidget {
           child: BlocBuilder<StoryBloc, StoryState>(
             builder: (context, state) {
               return state.mediaUrl.contains(".mp4")
-                  ? VideoStory()
-                  : StaticStory();
+                  ? const VideoStory()
+                  : const StaticStory();
             },
           )),
     );
