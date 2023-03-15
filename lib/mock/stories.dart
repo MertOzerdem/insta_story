@@ -15,7 +15,7 @@ final List<Story> stories = [
     user: user,
   ),
   const Story(
-    url: 'https://media.giphy.com/media/moyzrwjUIkdNe/giphy.gif',
+    url: 'https://petapixel.com/assets/uploads/2022/08/fdfs11-800x533.jpg',
     media: MediaType.img,
     user: user,
     duration: Duration(seconds: 3),
@@ -35,7 +35,8 @@ final List<Story> stories = [
     user: user,
   ),
   const Story(
-    url: 'https://media2.giphy.com/media/M8PxVICV5KlezP1pGE/giphy.gif',
+    url:
+        'https://cdn.pixabay.com/photo/2012/08/27/14/19/mountains-55067__340.png',
     media: MediaType.img,
     duration: Duration(seconds: 8),
     user: user,

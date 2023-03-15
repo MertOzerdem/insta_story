@@ -1,16 +1,16 @@
 part of 'story_bloc.dart';
 
-enum StoryStatus { initial, initialized, playing, paused, failure }
+enum StoryStatus { initial, initialized, resumed, paused, failure }
 
 class StoryState extends Equatable {
-  StoryState({
+  const StoryState({
     this.storyStatus = StoryStatus.initial,
     this.duration = const Duration(seconds: 5),
     required this.mediaUrl,
   });
 
-  StoryStatus storyStatus;
-  Duration duration;
+  final StoryStatus storyStatus;
+  final Duration duration;
   final String mediaUrl;
 
   StoryState copyWith({StoryStatus? storyStatus, Duration? duration}) {

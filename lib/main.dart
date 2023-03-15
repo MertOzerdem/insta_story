@@ -6,7 +6,7 @@ import 'mock/stories.dart';
 import 'modules/story_viewer/story_viewer.dart';
 
 void main() {
-  Bloc.observer = CustomBlocObserver();
+  // Bloc.observer = CustomBlocObserver();
   runApp(const MyApp());
 }
 

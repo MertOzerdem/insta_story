@@ -8,12 +8,14 @@ abstract class StoryEvent extends Equatable {
 }
 
 class StoryFetched extends StoryEvent {
-  StoryFetched([this.duration = const Duration(seconds: 5)]);
+  const StoryFetched([this.duration = const Duration(seconds: 5)]);
 
-  Duration duration;
+  final Duration duration;
 }
 
 class StoryPlayed extends StoryEvent {}
+
+class StoryResumed extends StoryEvent {}
 
 class StoryPaused extends StoryEvent {}
 

@@ -12,12 +12,14 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
         )) {
     on<StoryEvent>((StoryEvent event, Emitter<StoryState> emit) {});
     on<StoryFetched>(_onStoryFetched);
+    on<StoryLongPressStarted>(_onStoryPaused);
+    on<StoryLongPressEnded>(_onStoryResumed);
   }
 
   @override
   void onChange(Change<StoryState> change) {
     super.onChange(change);
-    print('change $change');
+    // print('change $change');
   }
 
   void _onStoryFetched(StoryFetched event, Emitter<StoryState> emit) {
@@ -25,6 +27,22 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
       state.copyWith(
         storyStatus: StoryStatus.initialized,
         duration: event.duration,
+      ),
+    );
+  }
+
+  void _onStoryPaused(StoryEvent event, Emitter<StoryState> emit) {
+    emit(
+      state.copyWith(
+        storyStatus: StoryStatus.paused,
+      ),
+    );
+  }
+
+  void _onStoryResumed(StoryEvent event, Emitter<StoryState> emit) {
+    emit(
+      state.copyWith(
+        storyStatus: StoryStatus.resumed,
       ),
     );
   }

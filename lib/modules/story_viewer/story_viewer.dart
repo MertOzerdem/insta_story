@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
-import 'package:insta_story/modules/story/view/story_page.dart';
-import '../../models/story.dart';
+import 'package:insta_story/modules/story/story.dart';
+import '../../models/story.dart' as model;
 import 'cubit/story_viewer_cubit.dart';
 
 class StoryViewer extends StatefulWidget {
-  final List<Story> stories;
+  final List<model.Story> stories;
 
-  StoryViewer({super.key, required this.stories});
+  const StoryViewer({super.key, required this.stories});
 
   @override
   State<StoryViewer> createState() => _StoryViewerState();
@@ -16,40 +15,34 @@ class StoryViewer extends StatefulWidget {
 
 class _StoryViewerState extends State<StoryViewer>
     with SingleTickerProviderStateMixin {
-  StoryViewerCubit _storyViewerCubit = StoryViewerCubit();
-  PageController _pageController = PageController();
-  // AnimationController? _animationController;
+  final StoryViewerCubit _storyViewerCubit = StoryViewerCubit();
+  final PageController _pageController = PageController();
 
   @override
-  void initState() {
-    super.initState();
-    // _animationController = AnimationController(vsync: this);
+  void dispose() {
+    _pageController.dispose();
+    _storyViewerCubit.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _storyViewerCubit = StoryViewerCubit();
-    _pageController = PageController();
-
-    return GestureDetector(
-      onTapDown: (details) => loadAction(details, context),
-      child: Stack(children: [
-        PageView.builder(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.stories.length,
-          itemBuilder: (context, i) {
-            final Story story = widget.stories[i];
-            // return Container(
-            //   decoration: BoxDecoration(
-            //       color: Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-            //           .withOpacity(1.0)),
-            // );
-            return StoryPage(mediaUrl: story.url);
-          },
-        ),
-      ]),
-    );
+    return Stack(children: [
+      PageView.builder(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: widget.stories.length,
+        itemBuilder: (context, i) {
+          final model.Story story = widget.stories[i];
+          return StoryPage(
+            mediaUrl: story.url,
+            onTapUp: (details) => loadAction(details, context),
+            onLongPressStart: () => print('long start'),
+            onLongPressUp: () => print('long end'),
+          );
+        },
+      ),
+    ]);
   }
 
   loadAction(details, BuildContext context) {

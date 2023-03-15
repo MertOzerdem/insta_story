@@ -45,8 +45,11 @@ class _VideoStoryState extends State<VideoStory> {
 
         if (state.storyStatus == StoryStatus.initialized) {
           _controller.play();
-          _storyBloc.add(StoryPlayed());
-        } else if (state.storyStatus == StoryStatus.playing) {}
+        } else if (state.storyStatus == StoryStatus.paused) {
+          _controller.pause();
+        } else if (state.storyStatus == StoryStatus.resumed) {
+          _controller.play();
+        }
 
         return FittedBox(
           fit: BoxFit.cover,
