@@ -3,6 +3,7 @@ import 'package:insta_story/modules/story/controller/story_controller.dart';
 
 import 'package:insta_story/modules/story/story.dart';
 import '../../models/story.dart' as model;
+import '../progress_bar/widget/progress_bar.dart';
 import '../story/bloc/story_bloc.dart';
 import 'cubit/story_viewer_cubit.dart';
 
@@ -43,8 +44,6 @@ class _StoryViewerState extends State<StoryViewer>
           _storyController = StoryController(
             storyBloc: StoryBloc(mediaUrl: story.url),
           )..initialize().then((_) {
-              print('mert');
-
               print('duration ${_storyController.duration}');
             });
 
@@ -55,6 +54,10 @@ class _StoryViewerState extends State<StoryViewer>
             onLongPressUp: () => print('long end'),
           );
         },
+      ),
+      const ProgressBar(
+        currentIndex: 0,
+        length: 3,
       ),
     ]);
   }
