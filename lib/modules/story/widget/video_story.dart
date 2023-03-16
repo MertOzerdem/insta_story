@@ -22,7 +22,7 @@ class _VideoStoryState extends State<VideoStory> {
 
     _controller = VideoPlayerController.network(_storyBloc.state.mediaUrl);
 
-    _controller.initialize().then((value) {
+    _controller.initialize().then((_) {
       _storyBloc.add(StoryFetched(_controller.value.duration));
     });
   }

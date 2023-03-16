@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insta_story/modules/story/controller/story_controller.dart';
 import 'dart:math' as math;
 
 import '../bloc/story_bloc.dart';
@@ -9,21 +10,21 @@ import '../widget/video_story.dart';
 class StoryPage extends StatelessWidget {
   const StoryPage({
     super.key,
-    required String mediaUrl,
+    required StoryController storyController,
     this.onTapUp,
     this.onLongPressUp,
     this.onLongPressStart,
-  }) : _mediaUrl = mediaUrl;
+  }) : _storyController = storyController;
 
-  final String _mediaUrl;
   final GestureTapUpCallback? onTapUp;
   final VoidCallback? onLongPressUp;
   final VoidCallback? onLongPressStart;
+  final StoryController _storyController;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => StoryBloc(mediaUrl: _mediaUrl),
+    return BlocProvider.value(
+      value: _storyController.storyBloc,
       child: Story(
         onTapUp: onTapUp,
         onLongPressStart: onLongPressStart,

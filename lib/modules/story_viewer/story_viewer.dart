@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:insta_story/modules/story/controller/story_controller.dart';
 
 import 'package:insta_story/modules/story/story.dart';
 import '../../models/story.dart' as model;
+import '../story/bloc/story_bloc.dart';
 import 'cubit/story_viewer_cubit.dart';
 
 class StoryViewer extends StatefulWidget {
@@ -17,11 +19,13 @@ class _StoryViewerState extends State<StoryViewer>
     with SingleTickerProviderStateMixin {
   final StoryViewerCubit _storyViewerCubit = StoryViewerCubit();
   final PageController _pageController = PageController();
+  late StoryController _storyController;
 
   @override
   void dispose() {
     _pageController.dispose();
     _storyViewerCubit.close();
+    _storyController.dispose();
     super.dispose();
   }
 
@@ -32,10 +36,20 @@ class _StoryViewerState extends State<StoryViewer>
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: widget.stories.length,
+        onPageChanged: (_) => _storyController.dispose(),
         itemBuilder: (context, i) {
           final model.Story story = widget.stories[i];
+
+          _storyController = StoryController(
+            storyBloc: StoryBloc(mediaUrl: story.url),
+          )..initialize().then((_) {
+              print('mert');
+
+              print('duration ${_storyController.duration}');
+            });
+
           return StoryPage(
-            mediaUrl: story.url,
+            storyController: _storyController,
             onTapUp: (details) => loadAction(details, context),
             onLongPressStart: () => print('long start'),
             onLongPressUp: () => print('long end'),
