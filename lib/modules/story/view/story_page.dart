@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insta_story/modules/story/controller/story_controller.dart';
-import 'dart:math' as math;
 
 import '../bloc/story_bloc.dart';
 import '../widget/static_story.dart';
@@ -49,7 +48,7 @@ class Story extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.black87),
+      decoration: const BoxDecoration(color: Colors.black87),
       child: GestureDetector(
         onTapUp: (details) => _onTapUp(details, context),
         onLongPressUp: () => _onLongPressUp(context),

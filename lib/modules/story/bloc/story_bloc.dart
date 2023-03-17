@@ -16,18 +16,9 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
     on<StoryLongPressEnded>(_onStoryResumed);
   }
 
-  dynamic initialized() async {
-    stream.listen((event) {
-      print('event $event');
-    });
-
-    return false;
-  }
-
   @override
   void onChange(Change<StoryState> change) {
     super.onChange(change);
-    // call state change stream here to notify listeners
     // print('change $change');
   }
 

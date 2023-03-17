@@ -10,15 +10,19 @@ import 'cubit/story_viewer_cubit.dart';
 
 enum Direction { next, previous }
 
+typedef VoidStoryCallback = void Function(model.Story story);
+
 class StoryViewer extends StatefulWidget {
   StoryViewer({
     super.key,
     required this.stories,
     this.onBoundBreachStart,
     this.onBoundBreachEnd,
+    this.onStoryStart,
   });
 
   final List<model.Story> stories;
+  VoidStoryCallback? onStoryStart;
   VoidCallback? onBoundBreachStart;
   VoidCallback? onBoundBreachEnd;
 
@@ -28,16 +32,29 @@ class StoryViewer extends StatefulWidget {
 
 class _StoryViewerState extends State<StoryViewer>
     with SingleTickerProviderStateMixin {
-  final StoryViewerCubit _storyViewerCubit = StoryViewerCubit();
-  final PageController _pageController = PageController();
-  final ProgressBarController _progressBarController = ProgressBarController();
-  late StoryController _storyController;
+  late StoryViewerCubit _storyViewerCubit;
+  late PageController _pageController;
+  late ProgressBarController _progressBarController;
+  StoryController? _storyController;
+  int firstUnseenStoryIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    firstUnseenStoryIndex = _getFirstUnseenStoryIndex();
+
+    _storyViewerCubit = StoryViewerCubit(firstUnseenStoryIndex);
+    _pageController = PageController(initialPage: firstUnseenStoryIndex);
+    _progressBarController = ProgressBarController();
+  }
 
   @override
   void dispose() {
     _pageController.dispose();
     _storyViewerCubit.close();
     _progressBarController.dispose();
+    // _storyController?.dispose();
     super.dispose();
   }
 
@@ -49,17 +66,20 @@ class _StoryViewerState extends State<StoryViewer>
         physics: const NeverScrollableScrollPhysics(),
         itemCount: widget.stories.length,
         onPageChanged: (_) {
-          _storyController.dispose();
+          // _storyController?.dispose();
           _progressBarController.clearListener();
         },
         itemBuilder: (context, i) {
           final model.Story story = widget.stories[i];
 
+          widget.onStoryStart?.call(story);
+
           _storyController = StoryController(
             storyBloc: StoryBloc(mediaUrl: story.url),
           )..initialize().then((_) {
-              _progressBarController
-                  .setDuration(_storyController.duration as Duration);
+              _progressBarController.setDuration(
+                _storyController?.duration ?? const Duration(seconds: 1),
+              );
               _progressBarController.forward();
             });
 
@@ -74,7 +94,7 @@ class _StoryViewerState extends State<StoryViewer>
           });
 
           return StoryPage(
-            storyController: _storyController,
+            storyController: _storyController!,
             onTapUp: (details) => _onTapUp(details, context),
             onLongPressStart: () => _progressBarController.stop(),
             onLongPressUp: () => _progressBarController.forward(),
@@ -82,7 +102,7 @@ class _StoryViewerState extends State<StoryViewer>
         },
       ),
       ProgressBar(
-        currentIndex: 0,
+        currentIndex: firstUnseenStoryIndex,
         length: widget.stories.length,
         progressBarController: _progressBarController,
       ),
@@ -141,5 +161,14 @@ class _StoryViewerState extends State<StoryViewer>
 
   _onSlidesFinish() {
     widget.onBoundBreachEnd?.call();
+  }
+
+  _getFirstUnseenStoryIndex() {
+    int firstUnseen = widget.stories.indexWhere((story) => !story.seen);
+    if (firstUnseen == -1) {
+      firstUnseen = 0;
+    }
+
+    return firstUnseen;
   }
 }
