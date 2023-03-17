@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:insta_story/modules/carousel/view/carousel.dart';
 
 import 'custom_bloc_observer.dart';
 import 'mock/stories.dart';
+import 'models/story.dart';
+import 'modules/carousel/view/carousel.dart';
 import 'modules/carousel/controller/carousel_controller.dart';
 import 'modules/story_viewer/story_viewer.dart';
 
@@ -21,38 +22,35 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: Colors.black87,
         body: Carousel(
           controller: _carouselController,
-          children: [
-            StoryViewer(
-              key: const Key('s1'),
-              stories: stories,
-              onBoundBreachEnd: () {
-                _carouselController.nextPage();
-              },
-              onBoundBreachStart: () {
-                _carouselController.previousPage();
-              },
-            ),
-            StoryViewer(
-              key: const Key('s2'),
-              stories: stories,
-              onBoundBreachEnd: () => _carouselController.nextPage(),
-              onBoundBreachStart: () {
-                _carouselController.previousPage();
-              },
-            ),
-            StoryViewer(
-              key: const Key('s3'),
-              stories: stories,
-              onBoundBreachEnd: () => _carouselController.nextPage(),
-              onBoundBreachStart: () {
-                _carouselController.previousPage();
-              },
-            ),
-          ],
+          children: _getStories(),
         ),
       ),
     );
+  }
+
+  List<Widget> _getStories() {
+    return user.storyGroups.map((storyGroup) {
+      return StoryViewer(
+        stories: storyGroup.stories,
+        onBoundBreachEnd: () => _onBoundBreachEnd(),
+        onBoundBreachStart: () => _onBoundBreachStart(),
+        onStoryStart: (story) => _onStoryStart(story),
+      );
+    }).toList();
+  }
+
+  void _onBoundBreachStart() {
+    _carouselController.previousPage();
+  }
+
+  void _onBoundBreachEnd() {
+    _carouselController.nextPage();
+  }
+
+  void _onStoryStart(Story story) {
+    story.seen = true;
   }
 }

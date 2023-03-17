@@ -1,11 +1,14 @@
-import 'package:equatable/equatable.dart';
 
-class User extends Equatable {
+import 'story_group.dart';
+
+class User {
   final String name;
   final String profileImg;
+  final List<StoryGroup> storyGroups;
 
-  const User({required this.name, required this.profileImg});
-
-  @override
-  List<Object?> get props => [name, profileImg];
+  const User({
+    required this.name,
+    required this.profileImg,
+    required this.storyGroups,
+  });
 }
