@@ -49,10 +49,7 @@ class Story extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-            .withOpacity(1.0),
-      ),
+      decoration: BoxDecoration(color: Colors.black87),
       child: GestureDetector(
         onTapUp: (details) => _onTapUp(details, context),
         onLongPressUp: () => _onLongPressUp(context),
