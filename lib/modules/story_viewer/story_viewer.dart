@@ -11,9 +11,16 @@ import 'cubit/story_viewer_cubit.dart';
 enum Direction { next, previous }
 
 class StoryViewer extends StatefulWidget {
-  final List<model.Story> stories;
+  StoryViewer({
+    super.key,
+    required this.stories,
+    this.onBoundBreachStart,
+    this.onBoundBreachEnd,
+  });
 
-  const StoryViewer({super.key, required this.stories});
+  final List<model.Story> stories;
+  VoidCallback? onBoundBreachStart;
+  VoidCallback? onBoundBreachEnd;
 
   @override
   State<StoryViewer> createState() => _StoryViewerState();
@@ -30,7 +37,6 @@ class _StoryViewerState extends State<StoryViewer>
   void dispose() {
     _pageController.dispose();
     _storyViewerCubit.close();
-    // _storyController.dispose();
     _progressBarController.dispose();
     super.dispose();
   }
@@ -61,6 +67,8 @@ class _StoryViewerState extends State<StoryViewer>
             if (status == AnimationStatus.completed) {
               if (_storyViewerCubit.state + 1 < widget.stories.length) {
                 _animateToStory(Direction.next);
+              } else {
+                _onSlidesFinish();
               }
             }
           });
@@ -87,15 +95,16 @@ class _StoryViewerState extends State<StoryViewer>
 
     int currentIndex = _storyViewerCubit.state;
     if (dx < screenWidth / 3) {
-      if (currentIndex - 1 >= 0) {
+      if (currentIndex == 0) {
+        widget.onBoundBreachStart?.call();
+      } else if (currentIndex > 0) {
         _animateToStory(Direction.previous);
       }
     } else if (dx > 2 * screenWidth / 3) {
       if (currentIndex + 1 < widget.stories.length) {
         _animateToStory(Direction.next);
       } else {
-        // Out of bounds - loop story
-        // You can also Navigator.of(context).pop() here
+        widget.onBoundBreachEnd?.call();
       }
     }
   }
@@ -128,5 +137,9 @@ class _StoryViewerState extends State<StoryViewer>
 
     _progressBarController.stop();
     _progressBarController.reset();
+  }
+
+  _onSlidesFinish() {
+    widget.onBoundBreachEnd?.call();
   }
 }

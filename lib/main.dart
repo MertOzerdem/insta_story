@@ -27,16 +27,30 @@ class MyApp extends StatelessWidget {
           controller: _carouselController,
           children: [
             StoryViewer(
-              key: Key('s1'),
+              key: const Key('s1'),
               stories: stories,
+              onBoundBreachEnd: () {
+                _carouselController.nextPage();
+              },
+              onBoundBreachStart: () {
+                _carouselController.previousPage();
+              },
             ),
             StoryViewer(
-              key: Key('s2'),
+              key: const Key('s2'),
               stories: stories,
+              onBoundBreachEnd: () => _carouselController.nextPage(),
+              onBoundBreachStart: () {
+                _carouselController.previousPage();
+              },
             ),
             StoryViewer(
-              key: Key('s3'),
+              key: const Key('s3'),
               stories: stories,
+              onBoundBreachEnd: () => _carouselController.nextPage(),
+              onBoundBreachStart: () {
+                _carouselController.previousPage();
+              },
             ),
           ],
         ),

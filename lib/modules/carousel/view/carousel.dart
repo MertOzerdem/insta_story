@@ -119,7 +119,6 @@ class CarouselWidgetState extends State<Carousel> {
   void initState() {
     super.initState();
     _carouselCubit = CarouselCubit(widget.initialPage);
-    // _currentPage = widget.initialPage;
     _initCarouselController();
     _initPageController();
   }
