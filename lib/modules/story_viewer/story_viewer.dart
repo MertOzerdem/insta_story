@@ -59,7 +59,9 @@ class _StoryViewerState extends State<StoryViewer>
 
           _progressBarController.listen((status) {
             if (status == AnimationStatus.completed) {
-              _animateToStory(Direction.next);
+              if (_storyViewerCubit.state + 1 < widget.stories.length) {
+                _animateToStory(Direction.next);
+              }
             }
           });
 
