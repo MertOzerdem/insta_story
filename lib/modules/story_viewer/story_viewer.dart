@@ -30,7 +30,7 @@ class _StoryViewerState extends State<StoryViewer>
   void dispose() {
     _pageController.dispose();
     _storyViewerCubit.close();
-    _storyController.dispose();
+    // _storyController.dispose();
     _progressBarController.dispose();
     super.dispose();
   }
