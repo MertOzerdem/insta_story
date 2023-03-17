@@ -9,10 +9,20 @@ class StaticStory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: context.read<StoryBloc>().state.mediaUrl,
-      placeholder: (context, url) => const CircularProgressIndicator(),
+    return FittedBox(
       fit: BoxFit.cover,
+      child: CachedNetworkImage(
+        imageUrl: context.read<StoryBloc>().state.mediaUrl,
+        fit: BoxFit.fill,
+        imageBuilder: (context, imageProvider) {
+          context.read<StoryBloc>().add(const StoryFetched());
+
+          return Image(image: imageProvider);
+        },
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
 }

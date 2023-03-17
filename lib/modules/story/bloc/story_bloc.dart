@@ -6,15 +6,53 @@ part 'story_state.dart';
 
 class StoryBloc extends Bloc<StoryEvent, StoryState> {
   StoryBloc({required String mediaUrl})
-      : super(StoryState(mediaUrl: mediaUrl)) {
-    on<StoryEvent>((event, emit) {
-      // TODO: implement event handler
+      : super(StoryState(
+          mediaUrl: mediaUrl,
+          storyStatus: StoryStatus.initial,
+        )) {
+    on<StoryEvent>((StoryEvent event, Emitter<StoryState> emit) {});
+    on<StoryFetched>(_onStoryFetched);
+    on<StoryLongPressStarted>(_onStoryPaused);
+    on<StoryLongPressEnded>(_onStoryResumed);
+  }
+
+  dynamic initialized() async {
+    stream.listen((event) {
+      print('event $event');
     });
+
+    return false;
   }
 
   @override
   void onChange(Change<StoryState> change) {
     super.onChange(change);
-    print('change $change');
+    // call state change stream here to notify listeners
+    // print('change $change');
+  }
+
+  void _onStoryFetched(StoryFetched event, Emitter<StoryState> emit) {
+    emit(
+      state.copyWith(
+        storyStatus: StoryStatus.initialized,
+        duration: event.duration,
+      ),
+    );
+  }
+
+  void _onStoryPaused(StoryEvent event, Emitter<StoryState> emit) {
+    emit(
+      state.copyWith(
+        storyStatus: StoryStatus.paused,
+      ),
+    );
+  }
+
+  void _onStoryResumed(StoryEvent event, Emitter<StoryState> emit) {
+    emit(
+      state.copyWith(
+        storyStatus: StoryStatus.resumed,
+      ),
+    );
   }
 }

@@ -7,7 +7,17 @@ abstract class StoryEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class StoryFetched extends StoryEvent {}
+class StoryFetched extends StoryEvent {
+  const StoryFetched([this.duration = const Duration(seconds: 5)]);
+
+  final Duration duration;
+}
+
+class StoryPlayed extends StoryEvent {}
+
+class StoryResumed extends StoryEvent {}
+
+class StoryPaused extends StoryEvent {}
 
 class StoryTappedUp extends StoryEvent {}
 

@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import 'package:insta_story/modules/story/controller/story_controller.dart';
 
-import 'package:insta_story/modules/story/view/story_page.dart';
-import '../../models/story.dart';
+import 'package:insta_story/modules/story/story.dart';
+import '../../models/story.dart' as model;
+import '../progress_bar/controller/progress_bar_controller.dart';
+import '../progress_bar/widget/progress_bar.dart';
+import '../story/bloc/story_bloc.dart';
 import 'cubit/story_viewer_cubit.dart';
 
-class StoryViewer extends StatefulWidget {
-  final List<Story> stories;
+enum Direction { next, previous }
 
-  StoryViewer({super.key, required this.stories});
+class StoryViewer extends StatefulWidget {
+  StoryViewer({
+    super.key,
+    required this.stories,
+    this.onBoundBreachStart,
+    this.onBoundBreachEnd,
+  });
+
+  final List<model.Story> stories;
+  VoidCallback? onBoundBreachStart;
+  VoidCallback? onBoundBreachEnd;
 
   @override
   State<StoryViewer> createState() => _StoryViewerState();
@@ -16,64 +28,118 @@ class StoryViewer extends StatefulWidget {
 
 class _StoryViewerState extends State<StoryViewer>
     with SingleTickerProviderStateMixin {
-  StoryViewerCubit _storyViewerCubit = StoryViewerCubit();
-  PageController _pageController = PageController();
-  // AnimationController? _animationController;
+  final StoryViewerCubit _storyViewerCubit = StoryViewerCubit();
+  final PageController _pageController = PageController();
+  final ProgressBarController _progressBarController = ProgressBarController();
+  late StoryController _storyController;
 
   @override
-  void initState() {
-    super.initState();
-    // _animationController = AnimationController(vsync: this);
+  void dispose() {
+    _pageController.dispose();
+    _storyViewerCubit.close();
+    _progressBarController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _storyViewerCubit = StoryViewerCubit();
-    _pageController = PageController();
+    return Stack(children: [
+      PageView.builder(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: widget.stories.length,
+        onPageChanged: (_) {
+          _storyController.dispose();
+          _progressBarController.clearListener();
+        },
+        itemBuilder: (context, i) {
+          final model.Story story = widget.stories[i];
 
-    return GestureDetector(
-      onTapDown: (details) => loadAction(details, context),
-      child: Stack(children: [
-        PageView.builder(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.stories.length,
-          itemBuilder: (context, i) {
-            final Story story = widget.stories[i];
-            // return Container(
-            //   decoration: BoxDecoration(
-            //       color: Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-            //           .withOpacity(1.0)),
-            // );
-            return StoryPage(mediaUrl: story.url);
-          },
-        ),
-      ]),
-    );
+          _storyController = StoryController(
+            storyBloc: StoryBloc(mediaUrl: story.url),
+          )..initialize().then((_) {
+              _progressBarController
+                  .setDuration(_storyController.duration as Duration);
+              _progressBarController.forward();
+            });
+
+          _progressBarController.listen((status) {
+            if (status == AnimationStatus.completed) {
+              if (_storyViewerCubit.state + 1 < widget.stories.length) {
+                _animateToStory(Direction.next);
+              } else {
+                _onSlidesFinish();
+              }
+            }
+          });
+
+          return StoryPage(
+            storyController: _storyController,
+            onTapUp: (details) => _onTapUp(details, context),
+            onLongPressStart: () => _progressBarController.stop(),
+            onLongPressUp: () => _progressBarController.forward(),
+          );
+        },
+      ),
+      ProgressBar(
+        currentIndex: 0,
+        length: widget.stories.length,
+        progressBarController: _progressBarController,
+      ),
+    ]);
   }
 
-  loadAction(details, BuildContext context) {
+  _onTapUp(details, BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double dx = details.globalPosition.dx;
 
     int currentIndex = _storyViewerCubit.state;
     if (dx < screenWidth / 3) {
-      if (currentIndex - 1 >= 0) {
-        _storyViewerCubit.decrement();
+      if (currentIndex == 0) {
+        widget.onBoundBreachStart?.call();
+      } else if (currentIndex > 0) {
+        _animateToStory(Direction.previous);
       }
     } else if (dx > 2 * screenWidth / 3) {
       if (currentIndex + 1 < widget.stories.length) {
-        _storyViewerCubit.increment();
+        _animateToStory(Direction.next);
       } else {
-        // Out of bounds - loop story
-        // You can also Navigator.of(context).pop() here
+        widget.onBoundBreachEnd?.call();
       }
     }
+  }
+
+  void _animateToStory(Direction direction) {
+    _processState(direction);
+    _processAnimatedBar(direction);
 
     _pageController.animateToPage(
       _storyViewerCubit.state,
       duration: const Duration(milliseconds: 1),
       curve: Curves.easeInOut,
     );
+  }
+
+  void _processState(Direction direction) {
+    if (direction == Direction.next) {
+      _storyViewerCubit.increment();
+    } else {
+      _storyViewerCubit.decrement();
+    }
+  }
+
+  void _processAnimatedBar(Direction direction) {
+    if (direction == Direction.next) {
+      _progressBarController.next();
+    } else {
+      _progressBarController.previous();
+    }
+
+    _progressBarController.stop();
+    _progressBarController.reset();
+  }
+
+  _onSlidesFinish() {
+    widget.onBoundBreachEnd?.call();
   }
 }

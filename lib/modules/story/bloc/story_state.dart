@@ -1,26 +1,26 @@
 part of 'story_bloc.dart';
 
-enum StoryStatus { initial, initialized, playing, paused, failure }
+enum StoryStatus { initial, initialized, resumed, paused, failure }
 
 class StoryState extends Equatable {
-  StoryState({
+  const StoryState({
     this.storyStatus = StoryStatus.initial,
+    this.duration = const Duration(seconds: 5),
     required this.mediaUrl,
   });
 
-  StoryStatus storyStatus;
+  final StoryStatus storyStatus;
+  final Duration duration;
   final String mediaUrl;
+
+  StoryState copyWith({StoryStatus? storyStatus, Duration? duration}) {
+    return StoryState(
+      mediaUrl: mediaUrl,
+      duration: duration ?? this.duration,
+      storyStatus: storyStatus ?? this.storyStatus,
+    );
+  }
 
   @override
   List<Object> get props => [storyStatus];
 }
-
-// class StoryLoading extends StoryState {}
-
-// class StoryInitialized extends StoryState {}
-
-// class StoryPlaying extends StoryState {}
-
-// class StoryPaused extends StoryState {}
-
-// class StoryErrored extends StoryState {}
