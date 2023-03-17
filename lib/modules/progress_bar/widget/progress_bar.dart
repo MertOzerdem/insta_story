@@ -34,12 +34,13 @@ class ProgressBarWidgetState extends State<ProgressBar>
     );
 
     _animationController = AnimationController(vsync: this);
+    _initProgressBarController();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
-    _initProgressBarController();
+    _progressBarCubit.close();
     super.dispose();
   }
 
@@ -75,6 +76,10 @@ class ProgressBarWidgetState extends State<ProgressBar>
     }, growable: false);
   }
 
+  void setDuration(Duration duration) {
+    _animationController.duration = duration;
+  }
+
   void next() {
     _progressBarCubit.increment();
   }
@@ -93,6 +98,16 @@ class ProgressBarWidgetState extends State<ProgressBar>
 
   void reset() {
     _animationController.reset();
+  }
+
+  void listen(Function(AnimationStatus) callback) {
+    _animationController.addStatusListener((status) {
+      callback(status);
+    });
+  }
+
+  void clearListener(){
+    _animationController.clearStatusListeners();
   }
 }
 
