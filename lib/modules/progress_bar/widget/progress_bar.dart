@@ -106,7 +106,7 @@ class ProgressBarWidgetState extends State<ProgressBar>
     });
   }
 
-  void clearListener(){
+  void clearListener() {
     _animationController.clearStatusListeners();
   }
 }

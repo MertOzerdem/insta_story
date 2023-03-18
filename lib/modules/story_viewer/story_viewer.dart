@@ -13,7 +13,7 @@ enum Direction { next, previous }
 typedef VoidStoryCallback = void Function(model.Story story);
 
 class StoryViewer extends StatefulWidget {
-  StoryViewer({
+  const StoryViewer({
     super.key,
     required this.stories,
     this.onBoundBreachStart,
@@ -22,9 +22,9 @@ class StoryViewer extends StatefulWidget {
   });
 
   final List<model.Story> stories;
-  VoidStoryCallback? onStoryStart;
-  VoidCallback? onBoundBreachStart;
-  VoidCallback? onBoundBreachEnd;
+  final VoidStoryCallback? onStoryStart;
+  final VoidCallback? onBoundBreachStart;
+  final VoidCallback? onBoundBreachEnd;
 
   @override
   State<StoryViewer> createState() => _StoryViewerState();
